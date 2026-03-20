@@ -10,9 +10,13 @@ make
 ./word_count <OPTIONS> <FILE>
 ```
 
-The `<OPTIONS>` are used to select which counts are printed, they are in respective order within the list
+The `<OPTIONS>` are used to select which counts are printed, they are printed in respective order within the list.
 
 With no count `<OPTIONS>`, `-a`, is by default.
+
+If `-i` is included with count `<OPTIONS>`, standard input will be used.
+
+`<FILE>` is the last argument. In conjunction with `-i`, standard input will be used upon `<FILE>`, then standard input. If omitted, standard input is thus used.
 
 ```shell
 <OPTIONS>:
@@ -36,7 +40,7 @@ With no count `<OPTIONS>`, `-a`, is by default.
 
 ```shell
 ./word_count test.txt
-test.txt 1 | 1 | 1 | 1
+test.txt 1, 1, 1, 1
 ```
 
 ```shell
@@ -46,4 +50,10 @@ test.txt
     characters: 1
     newlines: 1
     bytes: 1
+```
+
+```shell
+./word_count -i test.txt
+test.txt 1, 1, 1, 1
+> _
 ```

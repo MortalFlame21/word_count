@@ -1,0 +1,12 @@
+BasedOnStyle: LLVM
+
+Language: Cpp
+Standard: Cpp11
+
+ColumnLimit: 90
+UseTab: Never
+IndentWidth: 4
+TabWidth: 2
+IndentAccessModifiers: false
+AccessModifierOffset: -4
+ReferenceAlignment: Left

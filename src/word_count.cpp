@@ -32,17 +32,17 @@ struct info_t {
 enum opts { WORDS, CHARACTERS, LINES, BYTES, VERBOSE, STD_IN, MAX_OPTS };
 
 // constants
-const std::bitset<opts::MAX_OPTS> OPT_ALL{(1 << opts::WORDS) | (1 << opts::CHARACTERS) |
-                                          (1 << opts::LINES)};
+const std::bitset<opts::MAX_OPTS> OPT_COUNTS{(1 << opts::WORDS) |
+                                             (1 << opts::CHARACTERS) |
+                                             (1 << opts::LINES) | (1 << opts::BYTES)};
 
 // globals
 std::bitset<opts::MAX_OPTS> g_opts{};
 std::deque<std::filesystem::path> g_paths{};
-std::vector<info_t> g_counts{};
 
 void set_opt(std::string_view opt) {
     if (opt == "all" || opt == "a")
-        g_opts |= OPT_ALL;
+        g_opts |= OPT_COUNTS;
     else if (opt == "words" || opt == "w")
         g_opts.set(opts::WORDS);
     else if (opt == "chars" || opt == "c")
@@ -79,8 +79,8 @@ void parse_flags(int argc, char* const argv[]) {
         parse_opt(argv[i]);
     }
 
-    if (g_opts.none())
-        g_opts |= OPT_ALL;
+    if ((g_opts & OPT_COUNTS).none())
+        g_opts |= OPT_COUNTS;
 }
 
 void parse_files(int argc, char* const argv[]) {
@@ -134,16 +134,29 @@ count_t count(const std::istream& in) {
 }
 
 void print(const info_t& info) {
+    std::cout << info.label;
+
     if (g_opts.test(opts::VERBOSE)) {
-        std::cout << info.label << '\n';
-        std::cout << "\twords: " << info.count.words << '\n';
-        std::cout << "\tcharacters: " << info.count.characters << '\n';
-        std::cout << "\tnewlines: " << info.count.lines << '\n';
-        std::cout << "\tbytes: " << info.count.bytes << '\n';
+        std::cout << '\n';
+        if (g_opts.test(opts::WORDS))
+            std::cout << "\twords: " << info.count.words << '\n';
+        if (g_opts.test(opts::CHARACTERS))
+            std::cout << "\tcharacters: " << info.count.characters << '\n';
+        if (g_opts.test(opts::LINES))
+            std::cout << "\tnewlines: " << info.count.lines << '\n';
+        if (g_opts.test(opts::BYTES))
+            std::cout << "\tbytes: " << info.count.bytes << '\n';
     } else {
-        std::cout << info.label << " | " << info.count.words << ", "
-                  << info.count.characters << ", " << info.count.lines << ", "
-                  << info.count.bytes << '\n';
+        std::cout << " | ";
+        if (g_opts.test(opts::WORDS))
+            std::cout << info.count.words << ' ';
+        if (g_opts.test(opts::CHARACTERS))
+            std::cout << info.count.characters << ' ';
+        if (g_opts.test(opts::LINES))
+            std::cout << info.count.lines << ' ';
+        if (g_opts.test(opts::BYTES))
+            std::cout << info.count.bytes;
+        std::cout << '\n';
     }
 }
 
@@ -153,15 +166,16 @@ int main(int argc, char* argv[]) {
 
     namespace fs = std::filesystem;
 
+    std::vector<info_t> counts{};
     info_t sum_count{"total"};
 
     // print the files (if at all)
     for (auto& path : g_paths) {
         if (std::fstream ifs{path};
-            fs::is_regular_file(path) || fs::is_symlink(path) || ifs) {
-            g_counts.push_back({path.string(), count(ifs)});
-            print(g_counts.back());
-            sum_count += g_counts.back();
+            (fs::is_regular_file(path) || fs::is_symlink(path)) && ifs) {
+            counts.push_back({path.string(), count(ifs)});
+            print(counts.back());
+            sum_count += counts.back();
         } else {
             std::cout << "WARNING: " << path
                       << " is not a valid file path or bad file.\n";
@@ -173,6 +187,6 @@ int main(int argc, char* argv[]) {
         print({"std-in", count(std::cin)});
 
     // print total
-    if (g_counts.size() > 1)
+    if (counts.size() > 1)
         print(sum_count);
 }

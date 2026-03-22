@@ -20,6 +20,13 @@ struct count_t {
 struct info_t {
     std::string label{};
     count_t count{};
+
+    void operator+=(info_t o) {
+        count.words += o.count.words;
+        count.characters += o.count.characters;
+        count.lines += o.count.lines;
+        count.bytes += o.count.bytes;
+    }
 };
 
 enum opts { WORDS, CHARACTERS, LINES, BYTES, VERBOSE, STD_IN, MAX_OPTS };
@@ -106,7 +113,6 @@ count_t count(const std::istream& in) {
     bool in_word{};
     for (auto c : str) {
         c = static_cast<unsigned char>(c);
-
         if (std::isalnum(c) || std::ispunct(c)) {
             ++ct.characters;
             in_word = true;
@@ -147,14 +153,26 @@ int main(int argc, char* argv[]) {
 
     namespace fs = std::filesystem;
 
+    info_t sum_count{"total"};
+
+    // print the files (if at all)
     for (auto& path : g_paths) {
-        if (std::fstream ifs{path}; fs::is_regular_file(path) || fs::is_symlink(path) || ifs)
-            print({path.string(), count(ifs)});
-        else
+        if (std::fstream ifs{path};
+            fs::is_regular_file(path) || fs::is_symlink(path) || ifs) {
+            g_counts.push_back({path.string(), count(ifs)});
+            print(g_counts.back());
+            sum_count += g_counts.back();
+        } else {
             std::cout << "WARNING: " << path
                       << " is not a valid file path or bad file.\n";
+        }
     }
 
+    // print std-in (if at all)
     if (g_opts.test(opts::STD_IN))
         print({"std-in", count(std::cin)});
+
+    // print total
+    if (g_counts.size() > 1)
+        print(sum_count);
 }

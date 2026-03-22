@@ -96,26 +96,32 @@ void parse_files(int argc, char* const argv[]) {
         g_opts.set(opts::STD_IN);
 }
 
-count_t count(std::istream& in) {
+count_t count(const std::istream& in) {
     count_t ct{};
     // either read bytes from ifs or make user input via std::cin
     std::stringstream ss{};
     ss << in.rdbuf();
     auto str{ss.str()};
 
-    for (bool in_word{}; const auto& c : str) {
-        if (std::isalnum(c)) {
+    bool in_word{};
+    for (auto c : str) {
+        c = static_cast<unsigned char>(c);
+
+        if (std::isalnum(c) || std::ispunct(c)) {
             ++ct.characters;
             in_word = true;
         } else if (std::isspace(c)) {
             ++ct.characters;
-            if (in_word)
+            if (in_word) {
                 ++ct.words;
+                in_word = false;
+            }
             if (c == '\n')
-                ct.lines;
-            in_word = false;
+                ++ct.lines;
         }
     }
+    if (in_word)
+        ++ct.words;
     ct.bytes = str.size();
 
     return ct;
@@ -137,13 +143,12 @@ void print(const info_t& info) {
 
 int main(int argc, char* argv[]) {
     parse_flags(argc, argv);
-    std::cout << g_opts << '\n';
     parse_files(argc, argv);
 
     namespace fs = std::filesystem;
 
     for (auto& path : g_paths) {
-        if (std::fstream ifs{path}; !fs::is_regular_file(path) || !fs::is_symlink(path))
+        if (std::fstream ifs{path}; fs::is_regular_file(path) || fs::is_symlink(path) || ifs)
             print({path.string(), count(ifs)});
         else
             std::cout << "WARNING: " << path

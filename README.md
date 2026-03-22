@@ -12,11 +12,11 @@ make
 
 The `<OPTIONS>` are used to select which counts are printed, they are printed in respective order within the list.
 
-With no count `<OPTIONS>`, `-a`, is by default.
+With no count `<OPTIONS>`, `-ai`, is by default.
 
 If `-i` is included with count `<OPTIONS>`, standard input will be used.
 
-`<FILE>` is the last argument. In conjunction with `-i`, standard input will be used upon `<FILE>`, then standard input. If omitted, standard input is thus used.
+`<FILE>` is the last argument. In conjunction with `-i`, files will be printed then standard input. If omitted, standard input is thus used.
 
 ```shell
 <OPTIONS>:
@@ -40,7 +40,7 @@ If `-i` is included with count `<OPTIONS>`, standard input will be used.
 
 ```shell
 ./word_count test.txt
-test.txt 1, 1, 1, 1
+test.txt | 1, 1, 1, 1
 ```
 
 ```shell
@@ -53,7 +53,24 @@ test.txt
 ```
 
 ```shell
-./word_count -i test.txt
-test.txt 1, 1, 1, 1
-> _
+.clang-format
+        words: 22
+        characters: 210
+        newlines: 13
+        bytes: 210
+/home/user/.viminfo
+        words: 1239
+        characters: 12077
+        newlines: 495
+        bytes: 12077
+hello world!std-in
+        words: 2
+        characters: 12
+        newlines: 0
+        bytes: 12
+total
+        words: 1261
+        characters: 12287
+        newlines: 508
+        bytes: 12287
 ```

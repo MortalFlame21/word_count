@@ -10,3 +10,4 @@ TabWidth: 2
 IndentAccessModifiers: false
 AccessModifierOffset: -4
 ReferenceAlignment: Left
+PointerAlignment: Left

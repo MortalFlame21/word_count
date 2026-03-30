@@ -1,6 +1,10 @@
 # Word Count
 
-Print word, character count, newline, byte count from a line. A UNIX `wc` subset clone.
+Print word count, character count, newline count, byte count from a file. A UNIX `wc` subset clone.
+
+## Requirements
+
+Although simple, this program needs a C++20 compliant compiler and GNU make 4.x+ to compile.
 
 ## Usage
 
@@ -16,7 +20,9 @@ With no count `<OPTIONS>`, `-ai`, is by default.
 
 If `-i` is included with count `<OPTIONS>`, standard input will be used.
 
-`<FILE>` is the last argument. In conjunction with `-i`, files will be printed then standard input. If omitted, standard input is thus used.
+`<FILE>` is a list of existing file paths. In conjunction with `-i`, files will be printed then standard input. If omitted, standard input is thus used.
+
+To mark end of `<OPTIONS>`. Use `--`, subsequent arguments will be treated as `<FILE>`.
 
 ```shell
 <OPTIONS>:
@@ -53,6 +59,7 @@ test.txt
 ```
 
 ```shell
+./word_count -vi .clang-format ~/.viminfo
 .clang-format
         words: 22
         characters: 210

@@ -11,7 +11,7 @@ Although simple, this program needs a C++20 compliant compiler and GNU make 4.x+
 ```shell
 make
 
-./word_count <OPTIONS> <FILE>
+./build/word_count <OPTIONS> <FILE>
 ```
 
 The `<OPTIONS>` are used to select which counts are printed, they are printed in respective order within the list.

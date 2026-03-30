@@ -73,7 +73,7 @@ void parse_opt(std::string_view str) {
 void parse_flags(int argc, char* const argv[]) {
     for (int i{1}; i < argc; ++i) {
         std::string_view arg{argv[i]};
-        // only consider flags before "--"
+        // only consider flags before "--", end of options.
         if (arg == "--")
             break;
         parse_opt(argv[i]);
@@ -86,16 +86,16 @@ void parse_flags(int argc, char* const argv[]) {
 void parse_files(int argc, char* const argv[]) {
     namespace fs = std::filesystem;
 
-    bool parse_as_files{};
+    bool eoo_marker{};
     for (int i{1}; i < argc; ++i) {
         std::string arg{argv[i]};
 
         // parse next args as actual file name
-        if (arg == "--" && !parse_as_files)
-            parse_as_files = true;
+        if (arg == "--" && !eoo_marker)
+            eoo_marker = true;
         // after "--" parse all args as files
         // OR not seen "--" or before it, skip flags, flags begin with '-'.
-        else if (parse_as_files || !arg.starts_with('-'))
+        else if (eoo_marker || !arg.starts_with('-'))
             g_paths.push_back(arg);
     }
 

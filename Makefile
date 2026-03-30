@@ -16,7 +16,7 @@ all: $(BUILD_DIR)/$(TARGET)
 $(BUILD_DIR)/$(TARGET): $(OBJS)
 	$(CXX) $(OBJS) -o $@
 
-$(BUILD_DIR)/%.cpp.o: $(SRC_DIR)/%.cpp
+$(OBJ_DIR)/%.cpp.o: $(SRC_DIR)/%.cpp
 	mkdir -p $(dir $@)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
 

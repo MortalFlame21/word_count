@@ -66,7 +66,7 @@ void parse_opt(std::string_view str) {
         set_opt(str.substr(2, str.size() - 2));
     // parse individual characters of word
     else if (str.starts_with('-'))
-        for (int i{}; i < str.size(); ++i)
+        for (size_t i{}; i < str.size(); ++i)
             set_opt(str.substr(i, 1));
 }
 
@@ -128,7 +128,7 @@ count_t count(const std::istream& in) {
     }
     if (in_word)
         ++ct.words;
-    ct.bytes = str.size();
+    ct.bytes = static_cast<int>(str.size());
 
     return ct;
 }
